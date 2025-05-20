@@ -97,32 +97,15 @@ const BlockchairDashboard: React.FC = () => {
     }).format(price);
   };
 
-  const formatPercentage = (num: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'percent',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(num / 100);
-  };
-
-  const getChainIcon = (chain: string) => {
-    const icons: { [key: string]: string } = {
-      bitcoin: '₿',
-      ethereum: 'Ξ',
-      'bitcoin-cash': '₿',
-      litecoin: 'Ł',
-      'bitcoin-sv': '₿',
-      dogecoin: 'Ð',
-      dash: 'Ð',
-      ripple: 'XRP',
-      stellar: 'XLM',
-      monero: 'XMR',
-      cardano: '₳',
-      zcash: 'ZEC',
-      mixin: 'XIN'
-    };
-    return icons[chain] || chain.charAt(0).toUpperCase();
-  };
+  function timeAgo(date: Date | number) {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - (typeof date === 'number' ? date : date.getTime())) / 1000);
+    if (seconds < 60) return `${seconds} seconds ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minutes ago`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours} hours ago`;
+  }
 
   const chainMeta: Record<string, { name: string; symbol: string; color: string; icon: React.ReactNode }> = {
     bitcoin: {
@@ -152,16 +135,6 @@ const BlockchairDashboard: React.FC = () => {
     // ... add more chains as needed ...
   };
 
-  function timeAgo(date: Date | number) {
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - (typeof date === 'number' ? date : date.getTime())) / 1000);
-    if (seconds < 60) return `${seconds} seconds ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minutes ago`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours} hours ago`;
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-tr from-[#181824] via-[#23243a] to-[#3a1c71] py-12">
       <div className="max-w-7xl mx-auto px-4">
@@ -183,8 +156,6 @@ const BlockchairDashboard: React.FC = () => {
               const price = data.market_price_usd;
               const latestBlock = data.blocks;
               const blockTime = data.best_block_time;
-              // No average fee available in API, so display N/A
-              const avgFee = 'N/A';
               // Convert blockTime to time ago if possible
               let ago = '';
               if (blockTime) {
